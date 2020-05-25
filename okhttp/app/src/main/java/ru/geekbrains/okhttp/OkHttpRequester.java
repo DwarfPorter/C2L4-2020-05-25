@@ -2,6 +2,8 @@ package ru.geekbrains.okhttp;
 
 import android.os.Handler;
 
+import com.google.gson.Gson;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -11,6 +13,8 @@ import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import ru.geekbrains.okhttp.data.WeatherRequest;
+import ru.geekbrains.okhttp.model.Weather;
 
 public class OkHttpRequester {
 
@@ -34,10 +38,14 @@ public class OkHttpRequester {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 final String answer = response.body().string();
+                Gson gson = new Gson();
+                WeatherRequest weatherRequest = gson.fromJson(answer, WeatherRequest.class);
+                final Weather weather = new Weather();
+                weather.setTemperature((int) weatherRequest.getMain().getTemp());
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        listener.onCompleted(answer);
+                        listener.onCompleted(weather);
                     }
                 });
             }
@@ -52,6 +60,6 @@ public class OkHttpRequester {
     // Интерфейс обратного вызова; метод onCompleted вызывается по окончании
     // загрузки страницы
     public interface OnResponseCompleted {
-        void onCompleted(String content);
+        void onCompleted(Weather content);
     }
 }

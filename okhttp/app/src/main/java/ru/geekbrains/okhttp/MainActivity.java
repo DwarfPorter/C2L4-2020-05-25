@@ -4,6 +4,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.webkit.WebView;
+import android.widget.TextView;
+
+import java.util.Locale;
+
+import ru.geekbrains.okhttp.model.Weather;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -12,15 +17,15 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        final WebView page = findViewById(R.id.page);
+        final TextView temperature = findViewById(R.id.textTemp);
 
         OkHttpRequester requester = new OkHttpRequester(new OkHttpRequester.OnResponseCompleted() {
             @Override
-            public void onCompleted(String content) {
-                page.loadData(content, "text/html; charset=utf-8", "utf-8");
+            public void onCompleted(Weather content) {
+                temperature.setText(String.format(Locale.getDefault(),"%d", content.getTemperature()));
             }
         });
 
-        requester.run("https://geekbrains.ru");
+        requester.run("https://api.openweathermap.org/data/2.5/weather?q=moscow&units=metric&appid=240af58b6f095eb759a3ecd2d282d448");
     }
 }
